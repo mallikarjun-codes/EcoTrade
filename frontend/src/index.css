@@ -2,7 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* --- PREMIUM PURPLE/PINK/BLUE MESH THEME --- */
+html {
+  scroll-behavior: smooth;
+}
+/* --- PREMIUM BLUE MESH THEME --- */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -10,28 +13,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   /* Base color */
-  background-color: #ffffff;
+  background-color: #f0f9ff; /* Very light blue base */
 
-  /* THE PREMIUM MESH GRADIENT */
+  /* THE BLUE GRADIENT MAGIC */
   background-image: 
-    /* Top Left: Soft Purple */
-    radial-gradient(at 0% 0%, hsla(250, 100%, 92%, 0.5) 0px, transparent 50%),
-    /* Top Right: Soft Pink */
-    radial-gradient(at 100% 0%, hsla(340, 100%, 92%, 0.5) 0px, transparent 50%),
-    /* Bottom Left: Soft Blue */
-    radial-gradient(at 0% 100%, hsla(210, 100%, 92%, 0.5) 0px, transparent 50%),
-    /* Bottom Right: Lighter Purple/Rose */
-    radial-gradient(at 100% 100%, hsla(280, 100%, 92%, 0.5) 0px, transparent 50%);
+    /* Top Left: Fresh Sky Blue */
+    radial-gradient(at 0% 0%, hsla(210, 100%, 88%, 0.7) 0px, transparent 50%),
+    /* Top Right: Cyan/Teal (Eco friendly feel) */
+    radial-gradient(at 100% 0%, hsla(180, 100%, 88%, 0.6) 0px, transparent 50%),
+    /* Bottom Left: Deep Royal Blue hint */
+    radial-gradient(at 0% 100%, hsla(220, 100%, 90%, 0.5) 0px, transparent 50%),
+    /* Bottom Right: Soft Blue */
+    radial-gradient(at 100% 100%, hsla(200, 100%, 88%, 0.6) 0px, transparent 50%);
     
-  background-attachment: fixed; /* Keeps the gradient still while you scroll */
+  background-attachment: fixed;
   background-size: 100% 100%;
   background-repeat: no-repeat;
   color: #111827;
 }
 
-/* Optional: Makes inputs slightly glassy so the theme shows through */
-input, select, textarea, .glass-effect {
+/* Glass effect for inputs to blend with the blue */
+input, select, textarea {
   background-color: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }

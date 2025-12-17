@@ -6,8 +6,11 @@ import ComparisonModal from './components/ComparisonModal';
 import PaymentModal from './components/PaymentModal'; 
 import AdminDashboard from './components/AdminDashboard'; 
 import OrderPage from './components/OrderPage'; 
-import ProtectedAdminRoute from './components/ProtectedAdminRoute'; // <--- NEW IMPORT
-import { Loader2, ArrowRightLeft, LayoutDashboard, Store } from 'lucide-react';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
+import Footer from './components/Footer'; 
+import MarketingSections from './components/MarketingSections'; 
+import Registry from './components/Registry'; // <--- NEW IMPORT
+import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe } from 'lucide-react'; // <--- ADDED GLOBE
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 
 // --- LANDING PAGE (Logged Out) ---
@@ -15,7 +18,11 @@ const LandingPage = () => (
   <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center text-center px-4 relative overflow-hidden">
     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-green-500/10 blur-[100px] rounded-full pointer-events-none"></div>
     <div className="relative z-10 max-w-2xl">
-      <div className="w-16 h-16 bg-green-600 rounded-2xl mx-auto mb-6 shadow-lg shadow-green-500/20"></div>
+      <div className="mx-auto mb-6 flex justify-center">
+        <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/20">
+            <Leaf className="text-white w-10 h-10" />
+        </div>
+      </div>
       <h1 className="text-5xl font-bold text-white mb-6 tracking-tight">Eco<span className="text-green-500">Trade</span></h1>
       <p className="text-gray-400 text-lg mb-8">The transparent, verifiable marketplace for carbon offsets.</p>
       <SignInButton mode="modal">
@@ -27,7 +34,7 @@ const LandingPage = () => (
   </div>
 );
 
-// --- MARKETPLACE COMPONENT (The Main Store) ---
+// --- MARKETPLACE COMPONENT ---
 const Marketplace = () => {
   const { user } = useUser();
   const navigate = useNavigate(); 
@@ -45,14 +52,8 @@ const Marketplace = () => {
 
   useEffect(() => {
     fetchProjects()
-      .then(res => { 
-        setProjects(res.data); 
-        setLoading(false); 
-      })
-      .catch(err => {
-        console.error("API Error:", err);
-        setLoading(false); 
-      });
+      .then(res => { setProjects(res.data); setLoading(false); })
+      .catch(err => { console.error("API Error:", err); setLoading(false); });
   }, []);
 
   const handleBuyClick = (project) => {
@@ -71,15 +72,11 @@ const Marketplace = () => {
         total_price: selectedProject.price_per_ton * 10,
         project_title: selectedProject.title
       };
-      
       const response = await createOrder(orderData);
-      
       setShowPayment(false); 
       navigate(`/order/${response.data._id}`); 
-
     } catch (error) {
       alert("Order Failed!");
-      console.error(error);
       setShowPayment(false);
     }
   };
@@ -94,23 +91,16 @@ const Marketplace = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Payment Modal */}
+    <div className="max-w-7xl mx-auto px-4 py-8 min-h-[80vh]">
+      {/* Modals */}
       {showPayment && selectedProject && (
-        <PaymentModal 
-          project={selectedProject} 
-          user={user}
-          onClose={() => setShowPayment(false)}
-          onSuccess={handlePaymentSuccess}
-        />
+        <PaymentModal project={selectedProject} user={user} onClose={() => setShowPayment(false)} onSuccess={handlePaymentSuccess}/>
       )}
-
-      {/* Comparison Modal */}
       {showCompareModal && (
         <ComparisonModal projects={selectedForCompare} onClose={() => setShowCompareModal(false)} onBuy={handleBuyClick} />
       )}
       
-      {/* Floating Action Button (Responsive) */}
+      {/* Floating Action Button */}
       {selectedForCompare.length > 0 && (
         <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-40 flex items-center gap-4 animate-in slide-in-from-bottom-10 w-max max-w-[90%]">
           <span className="font-bold text-sm whitespace-nowrap">{selectedForCompare.length} Selected</span>
@@ -122,7 +112,7 @@ const Marketplace = () => {
         </div>
       )}
 
-      {/* RESPONSIVE HEADER */}
+      {/* Header Section */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Welcome, {user?.firstName}! 👋</h2>
@@ -151,37 +141,57 @@ const Marketplace = () => {
           ))}
         </div>
       )}
+
+      {/* --- MARKETING SECTIONS (SCROLL TARGETS) --- */}
+      <MarketingSections />
+
     </div>
   );
 };
 
-// --- MAIN LAYOUT & ROUTER ---
+// --- MAIN LAYOUT ---
 function App() {
-  const { isLoaded, user } = useUser(); // <--- Ensure 'user' is destructured here for the check
+  const { isLoaded, user } = useUser();
   const navigate = useNavigate();
 
   if (!isLoaded) return <div className="min-h-screen flex justify-center items-center"><Loader2 className="animate-spin text-green-600" size={48} /></div>;
- 
+
   return (
     <>
       <SignedOut><LandingPage /></SignedOut>
       <SignedIn>
-        <div className="min-h-screen bg-transparent text-gray-900 font-sans">
+        <div className="min-h-screen bg-transparent text-gray-900 font-sans flex flex-col">
           {/* Global Header */}
-          <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+          <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-              <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
-                 <div className="w-8 h-8 bg-green-600 rounded-lg mr-3"></div>
-                 <h1 className="text-xl font-bold">EcoTrade</h1>
+              
+              {/* Logo Side */}
+              <div className="flex items-center cursor-pointer gap-2" onClick={() => navigate('/')}>
+                 <Leaf className="text-green-600 w-6 h-6" />
+                 <h1 className="text-xl font-bold tracking-tight">EcoTrade</h1>
               </div>
+
+              {/* Center Links (Smooth Scroll) */}
+              <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-500">
+                <a href="#how-it-works" className="hover:text-green-600 transition">How it Works</a>
+                <a href="#impact" className="hover:text-green-600 transition">Impact</a>
+                <a href="#pricing" className="hover:text-green-600 transition">Pricing</a>
+              </div>
+
+              {/* Right Side Actions */}
               <div className="flex items-center gap-4">
-                {/* 1. Market Link (Always Visible) */}
+                {/* NEW REGISTRY LINK */}
+                <Link to="/registry" className="text-sm font-medium text-gray-600 hover:text-green-600 flex items-center p-2">
+                  <Globe size={20} />
+                  <span className="hidden sm:inline ml-2">Registry</span>
+                </Link>
+
                 <Link to="/" className="text-sm font-medium text-gray-600 hover:text-green-600 flex items-center p-2">
                   <Store size={20} />
                   <span className="hidden sm:inline ml-2">Market</span>
                 </Link>
 
-                {/* 2. Dashboard Link (SECURED: Only visible if Admin) */}
+                {/* Admin Link (Secured) */}
                 {user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL && (
                   <Link to="/admin" className="text-sm font-medium text-gray-600 hover:text-green-600 flex items-center mr-2 p-2">
                     <LayoutDashboard size={20} />
@@ -194,21 +204,18 @@ function App() {
             </div>
           </header>
 
+          {/* Content */}
           <Routes>
             <Route path="/" element={<Marketplace />} />
-            
-            {/* 3. Protected Route (SECURED: Only accessible if Admin) */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedAdminRoute>
-                  <AdminDashboard />
-                </ProtectedAdminRoute>
-              } 
-            />
-            
+            <Route path="/registry" element={<Registry />} /> {/* <--- NEW ROUTE */}
+            <Route path="/admin" element={
+                <ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>
+            }/>
             <Route path="/order/:id" element={<OrderPage />} />
           </Routes>
+          
+          {/* Footer at Bottom */}
+          <Footer />
         </div>
       </SignedIn>
     </>
