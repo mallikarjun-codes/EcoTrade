@@ -2,10 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
-/* --- PREMIUM BLUE MESH THEME --- */
+/* --- THE "DOUBLE NATURE" TECH THEME --- */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -13,28 +10,50 @@ body {
   -moz-osx-font-smoothing: grayscale;
 
   /* Base color */
-  background-color: #f0f9ff; /* Very light blue base */
+  background-color: #f0f9ff; 
 
-  /* THE BLUE GRADIENT MAGIC */
+  /* THE LAYERED BACKGROUND COMPOSITION */
   background-image: 
-    /* Top Left: Fresh Sky Blue */
-    radial-gradient(at 0% 0%, hsla(210, 100%, 88%, 0.7) 0px, transparent 50%),
-    /* Top Right: Cyan/Teal (Eco friendly feel) */
-    radial-gradient(at 100% 0%, hsla(180, 100%, 88%, 0.6) 0px, transparent 50%),
-    /* Bottom Left: Deep Royal Blue hint */
-    radial-gradient(at 0% 100%, hsla(220, 100%, 90%, 0.5) 0px, transparent 50%),
-    /* Bottom Right: Soft Blue */
+    /* LAYER 1: Top Left Leaf (Points Down/Inward) - 3% Opacity */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23166534'%3E%3Cpath d='M21,3C21,3 19,13 11,17C3,21 3,21 3,21C3,21 5,11 13,7C21,3 21,3 21,3ZM13,7C9,9 6,14 5,16C7,15 10,13 13,7Z' opacity='0.03' /%3E%3C/svg%3E"),
+
+    /* LAYER 2: Bottom Right Leaf (The Original "Ghost" Leaf) - 3% Opacity */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23166534'%3E%3Cpath d='M12.0003 3C17.9613 3 22.1306 6.68532 21.0456 12.0028C20.2526 15.8906 17.0725 19.4616 12.396 21L12.0003 21C7.32379 19.4616 4.14369 15.8906 3.35067 12.0028C2.2657 6.68532 6.43501 3 12.0003 3ZM12.0003 5.30769C8.36941 5.30769 5.25056 7.64413 5.92205 11.2335C6.4468 14.0378 8.87532 16.9664 12.0003 18.2573C15.1253 16.9664 17.5539 14.0378 18.0786 11.2335C18.7501 7.64413 15.6312 5.30769 12.0003 5.30769Z' opacity='0.03' /%3E%3C/svg%3E"),
+    
+    /* LAYER 3: The "White Halo" (Center Spotlight) */
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.8) 0%, transparent 60%),
+
+    /* LAYER 4: The Premium Blue Mesh */
+    radial-gradient(at 0% 0%, hsla(210, 100%, 85%, 0.8) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(180, 100%, 85%, 0.8) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(220, 100%, 92%, 0.5) 0px, transparent 50%),
     radial-gradient(at 100% 100%, hsla(200, 100%, 88%, 0.6) 0px, transparent 50%);
     
   background-attachment: fixed;
-  background-size: 100% 100%;
+  /* Positioning: Top-Left, Bottom-Right, Center, Gradients */
+  background-position: top -10vh left -10vw, bottom -20vh right -10vw, center, center; 
+  /* Sizing: Huge Leaves */
+  background-size: 70vh 70vh, 80vh 80vh, 100% 100%, 100% 100%; 
   background-repeat: no-repeat;
   color: #111827;
 }
 
-/* Glass effect for inputs to blend with the blue */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Glass Inputs */
 input, select, textarea {
   background-color: rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+/* NAVBAR */
+.navbar-bg {
+  background-color: rgba(255, 255, 255, 0.75); 
+  backdrop-filter: blur(20px) saturate(180%); 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }

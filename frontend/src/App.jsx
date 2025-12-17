@@ -9,8 +9,8 @@ import OrderPage from './components/OrderPage';
 import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import Footer from './components/Footer'; 
 import MarketingSections from './components/MarketingSections'; 
-import Registry from './components/Registry'; // <--- NEW IMPORT
-import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe } from 'lucide-react'; // <--- ADDED GLOBE
+import Registry from './components/Registry'; 
+import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe, Sparkles } from 'lucide-react'; // <--- ADDED SPARKLES
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 
 // --- LANDING PAGE (Logged Out) ---
@@ -161,45 +161,55 @@ function App() {
       <SignedOut><LandingPage /></SignedOut>
       <SignedIn>
         <div className="min-h-screen bg-transparent text-gray-900 font-sans flex flex-col">
-          {/* Global Header */}
-          <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+          
+          {/* --- GLOBAL HEADER (UPDATED PRO STYLE) --- */}
+          <header className="navbar-bg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
               
               {/* Logo Side */}
-              <div className="flex items-center cursor-pointer gap-2" onClick={() => navigate('/')}>
+              <div className="flex items-center cursor-pointer gap-2 hover:opacity-80 transition" onClick={() => navigate('/')}>
                  <Leaf className="text-green-600 w-6 h-6" />
-                 <h1 className="text-xl font-bold tracking-tight">EcoTrade</h1>
+                 <h1 className="text-xl font-bold tracking-tight text-gray-900">EcoTrade</h1>
               </div>
 
-              {/* Center Links (Smooth Scroll) */}
-              <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gray-500">
-                <a href="#how-it-works" className="hover:text-green-600 transition">How it Works</a>
-                <a href="#impact" className="hover:text-green-600 transition">Impact</a>
-                <a href="#pricing" className="hover:text-green-600 transition">Pricing</a>
+              {/* Center Links (Pill Style) */}
+              <div className="hidden md:flex items-center gap-2">
+                <a href="#how-it-works" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">How it Works</a>
+                <a href="#impact" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">Impact</a>
+                <a href="#pricing" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">Pricing</a>
               </div>
 
               {/* Right Side Actions */}
-              <div className="flex items-center gap-4">
-                {/* NEW REGISTRY LINK */}
-                <Link to="/registry" className="text-sm font-medium text-gray-600 hover:text-green-600 flex items-center p-2">
-                  <Globe size={20} />
-                  <span className="hidden sm:inline ml-2">Registry</span>
-                </Link>
+              <div className="flex items-center gap-2">
+                
+                {/* REGISTRY LINK (With Aligned Badge) */}
+<Link to="/registry" className="hidden sm:flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all group">
+  <Globe size={18} className="mr-2 text-gray-400 group-hover:text-green-600 transition-colors" />
+  <span className="relative top-[1px]">Registry</span> {/* Tiny adjustment for font baseline */}
+  
+  {/* THE BADGE */}
+  <span className="ml-2 flex items-center justify-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-200 shadow-sm">
+    NEW
+  </span>
+</Link>
 
-                <Link to="/" className="text-sm font-medium text-gray-600 hover:text-green-600 flex items-center p-2">
+                <Link to="/" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">
                   <Store size={20} />
                   <span className="hidden sm:inline ml-2">Market</span>
                 </Link>
 
                 {/* Admin Link (Secured) */}
-                {user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL && (
-                  <Link to="/admin" className="text-sm font-medium text-gray-600 hover:text-green-600 flex items-center mr-2 p-2">
-                    <LayoutDashboard size={20} />
-                    <span className="hidden sm:inline ml-2">Dashboard</span>
-                  </Link>
-                )}
+{user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL && (
+  <Link to="/admin" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">
+    <LayoutDashboard size={20} />
+    {/* ADDED THIS TEXT SPAN BELOW: */}
+    <span className="hidden sm:inline ml-2">Admin</span> 
+  </Link>
+)}
 
-                <UserButton afterSignOutUrl="/" />
+                <div className="ml-2 pl-2 border-l border-gray-200">
+                  <UserButton afterSignOutUrl="/" />
+                </div>
               </div>
             </div>
           </header>
@@ -207,7 +217,7 @@ function App() {
           {/* Content */}
           <Routes>
             <Route path="/" element={<Marketplace />} />
-            <Route path="/registry" element={<Registry />} /> {/* <--- NEW ROUTE */}
+            <Route path="/registry" element={<Registry />} />
             <Route path="/admin" element={
                 <ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>
             }/>
