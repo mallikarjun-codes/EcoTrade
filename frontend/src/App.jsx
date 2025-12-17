@@ -161,7 +161,7 @@ function App() {
   const navigate = useNavigate();
 
   if (!isLoaded) return <div className="min-h-screen flex justify-center items-center"><Loader2 className="animate-spin text-green-600" size={48} /></div>;
-
+ 
   return (
     <>
       <SignedOut><LandingPage /></SignedOut>
