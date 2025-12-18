@@ -82,4 +82,4 @@ cd frontend && npm run dev
 
 ---
 
-*Built with 💚 by Sarvesh Madawal.*
+*Built with _______________*
