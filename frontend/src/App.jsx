@@ -10,7 +10,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import Footer from './components/Footer'; 
 import MarketingSections from './components/MarketingSections'; 
 import Registry from './components/Registry'; 
-import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe, Sparkles } from 'lucide-react'; // <--- ADDED SPARKLES
+import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe, Sparkles } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 
 // --- LANDING PAGE (Logged Out) ---
@@ -49,6 +49,9 @@ const Marketplace = () => {
   // Payment States
   const [showPayment, setShowPayment] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  
+  // --- FIX: Store Selected Quantity ---
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   useEffect(() => {
     fetchProjects()
@@ -56,32 +59,44 @@ const Marketplace = () => {
       .catch(err => { console.error("API Error:", err); setLoading(false); });
   }, []);
 
-  const handleBuyClick = (project) => {
+  // --- UPDATED HANDLER: Now accepts quantity ---
+  const handleBuyClick = (project, quantity = 1) => {
     setShowCompareModal(false);
     setSelectedProject(project);
+    setSelectedQuantity(quantity); // Store the user's input
     setShowPayment(true);
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (purchasedQuantity) => {
     try {
+      // Use the quantity passed from the Modal
+      const finalQuantity = purchasedQuantity || 1;
+      const finalPrice = selectedProject.price_per_ton * finalQuantity;
+
       const orderData = {
         project_id: selectedProject._id,
         user_email: user.primaryEmailAddress?.emailAddress,
         user_name: user.fullName,
-        quantity_tons: 10,
-        total_price: selectedProject.price_per_ton * 10,
+        quantity_tons: finalQuantity, 
+        total_price: finalPrice,      
         project_title: selectedProject.title
       };
+      
       const response = await createOrder(orderData);
       setShowPayment(false); 
+      
+      // Success Alert
+      alert(`Success! 🚀\n\nYou have successfully offset ${finalQuantity} tons.\nTotal Paid: $${finalPrice}`);
+      
       navigate(`/order/${response.data._id}`); 
     } catch (error) {
-      alert("Order Failed!");
+      console.error(error);
+      alert("Order Failed! Please try again.");
       setShowPayment(false);
     }
   };
-
   const toggleCompareMode = () => { setCompareMode(!compareMode); setSelectedForCompare([]); };
+  
   const handleToggleCompare = (project) => {
     if (selectedForCompare.find(p => p._id === project._id)) {
       setSelectedForCompare(selectedForCompare.filter(p => p._id !== project._id));
@@ -94,7 +109,13 @@ const Marketplace = () => {
     <div className="max-w-7xl mx-auto px-4 py-8 min-h-[80vh]">
       {/* Modals */}
       {showPayment && selectedProject && (
-        <PaymentModal project={selectedProject} user={user} onClose={() => setShowPayment(false)} onSuccess={handlePaymentSuccess}/>
+        <PaymentModal 
+            project={selectedProject} 
+            user={user} 
+            quantity={selectedQuantity} // Pass quantity to modal if supported
+            onClose={() => setShowPayment(false)} 
+            onSuccess={handlePaymentSuccess}
+        />
       )}
       {showCompareModal && (
         <ComparisonModal projects={selectedForCompare} onClose={() => setShowCompareModal(false)} onBuy={handleBuyClick} />
@@ -133,7 +154,7 @@ const Marketplace = () => {
             <ProjectCard 
               key={project._id} 
               project={project} 
-              onBuy={handleBuyClick}
+              onBuy={handleBuyClick} // Passes (project, quantity) to handler
               isCompareMode={compareMode}
               isSelected={!!selectedForCompare.find(p => p._id === project._id)}
               onToggleCompare={handleToggleCompare}
@@ -162,7 +183,7 @@ function App() {
       <SignedIn>
         <div className="min-h-screen bg-transparent text-gray-900 font-sans flex flex-col">
           
-          {/* --- GLOBAL HEADER (UPDATED PRO STYLE) --- */}
+          {/* --- GLOBAL HEADER --- */}
           <header className="navbar-bg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
               
@@ -182,16 +203,14 @@ function App() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-2">
                 
-                {/* REGISTRY LINK (With Aligned Badge) */}
-<Link to="/registry" className="hidden sm:flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all group">
-  <Globe size={18} className="mr-2 text-gray-400 group-hover:text-green-600 transition-colors" />
-  <span className="relative top-[1px]">Registry</span> {/* Tiny adjustment for font baseline */}
-  
-  {/* THE BADGE */}
-  <span className="ml-2 flex items-center justify-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-200 shadow-sm">
-    NEW
-  </span>
-</Link>
+                {/* REGISTRY LINK */}
+                <Link to="/registry" className="hidden sm:flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all group">
+                  <Globe size={18} className="mr-2 text-gray-400 group-hover:text-green-600 transition-colors" />
+                  <span className="relative top-[1px]">Registry</span>
+                  <span className="ml-2 flex items-center justify-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-200 shadow-sm">
+                    NEW
+                  </span>
+                </Link>
 
                 <Link to="/" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">
                   <Store size={20} />
@@ -199,13 +218,12 @@ function App() {
                 </Link>
 
                 {/* Admin Link (Secured) */}
-{user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL && (
-  <Link to="/admin" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">
-    <LayoutDashboard size={20} />
-    {/* ADDED THIS TEXT SPAN BELOW: */}
-    <span className="hidden sm:inline ml-2">Admin</span> 
-  </Link>
-)}
+                {user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL && (
+                  <Link to="/admin" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">
+                    <LayoutDashboard size={20} />
+                    <span className="hidden sm:inline ml-2">Admin</span> 
+                  </Link>
+                )}
 
                 <div className="ml-2 pl-2 border-l border-gray-200">
                   <UserButton afterSignOutUrl="/" />
@@ -224,7 +242,6 @@ function App() {
             <Route path="/order/:id" element={<OrderPage />} />
           </Routes>
           
-          {/* Footer at Bottom */}
           <Footer />
         </div>
       </SignedIn>
