@@ -1,90 +1,142 @@
 import React from 'react';
-import { X, ShieldCheck, FileText, Leaf } from 'lucide-react';
+import { X, CheckCircle, Shield, Zap, Globe, AlertTriangle } from 'lucide-react';
 
 const ComparisonModal = ({ projects, onClose, onBuy }) => {
-  if (projects.length < 2) return null;
-  const [p1, p2] = projects;
+  // SAFETY CHECK: If no projects or empty array, return nothing (prevents crash)
+  if (!projects || projects.length === 0) return null;
+
+  // Safe access to Project A and Project B
+  const p1 = projects[0];
+  const p2 = projects[1] || null; // Handle case where 2nd project might be missing
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="bg-gray-900 text-white p-4 flex justify-between items-center shrink-0">
-          <h2 className="text-xl font-bold flex items-center">
-            <Leaf className="mr-2" /> Impact Comparator
-          </h2>
-          <button onClick={onClose} className="hover:bg-gray-700 p-2 rounded-full transition">
-            <X size={20} />
+        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">Project Comparison</h3>
+            <p className="text-sm text-gray-500">Analyzing impact, price, and verification.</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+            <X size={24} className="text-gray-500" />
           </button>
         </div>
 
-        {/* Scrollable Content */}
-        <div className="overflow-y-auto flex-grow">
-          <div className="grid grid-cols-2 divide-x divide-gray-200 h-full">
-            <ProjectColumn project={p1} otherProject={p2} onBuy={onBuy} />
-            <ProjectColumn project={p2} otherProject={p1} onBuy={onBuy} />
+        {/* Content - Scrollable */}
+        <div className="overflow-y-auto p-6">
+          <div className="grid grid-cols-2 gap-4 md:gap-8">
+            
+            {/* --- PROJECT 1 COLUMN --- */}
+            <div className="flex flex-col h-full border rounded-2xl p-4 md:p-6 bg-white shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+               {/* Selection Indicator */}
+               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+               
+               <div className="h-40 mb-4 rounded-xl overflow-hidden relative">
+                 <img src={p1.image_url} alt={p1.title} className="w-full h-full object-cover" />
+                 <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-md text-white text-xs px-2 py-1 rounded">
+                   {p1.location}
+                 </div>
+               </div>
+
+               <h4 className="text-lg font-bold text-gray-900 mb-2 leading-tight min-h-[3rem]">{p1.title}</h4>
+               
+               <div className="space-y-4 mb-6 flex-grow">
+                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-500 text-sm">Type</span>
+                    <span className="font-semibold text-gray-800">{p1.type}</span>
+                 </div>
+                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-500 text-sm">Price/Ton</span>
+                    <span className="font-bold text-xl text-gray-900">${p1.price_per_ton}</span>
+                 </div>
+                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-500 text-sm">Verified By</span>
+                    <span className="flex items-center text-green-600 text-sm font-medium">
+                      <Shield size={14} className="mr-1" /> Verra/Gold Std
+                    </span>
+                 </div>
+               </div>
+
+               <button 
+                 onClick={() => onBuy(p1)}
+                 className="w-full py-3 rounded-xl border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-900 hover:text-white transition-all"
+               >
+                 Select This Project
+               </button>
+            </div>
+
+            {/* --- PROJECT 2 COLUMN --- */}
+            {p2 ? (
+              <div className="flex flex-col h-full border rounded-2xl p-4 md:p-6 bg-white shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-green-600"></div>
+                 
+                 <div className="h-40 mb-4 rounded-xl overflow-hidden relative">
+                   <img src={p2.image_url} alt={p2.title} className="w-full h-full object-cover" />
+                   <div className="absolute bottom-2 left-2 bg-black/50 backdrop-blur-md text-white text-xs px-2 py-1 rounded">
+                     {p2.location}
+                   </div>
+                 </div>
+
+                 <h4 className="text-lg font-bold text-gray-900 mb-2 leading-tight min-h-[3rem]">{p2.title}</h4>
+                 
+                 <div className="space-y-4 mb-6 flex-grow">
+                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-500 text-sm">Type</span>
+                      <span className="font-semibold text-gray-800">{p2.type}</span>
+                   </div>
+                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-500 text-sm">Price/Ton</span>
+                      <span className={`font-bold text-xl ${p2.price_per_ton < p1.price_per_ton ? 'text-green-600' : 'text-gray-900'}`}>
+                        ${p2.price_per_ton}
+                      </span>
+                   </div>
+                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                      <span className="text-gray-500 text-sm">Verified By</span>
+                      <span className="flex items-center text-green-600 text-sm font-medium">
+                        <Shield size={14} className="mr-1" /> Verra/Gold Std
+                      </span>
+                   </div>
+                 </div>
+
+                 <button 
+                   onClick={() => onBuy(p2)}
+                   className="w-full py-3 rounded-xl border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-900 hover:text-white transition-all"
+                 >
+                   Select This Project
+                 </button>
+              </div>
+            ) : (
+              // Empty State for Project 2 (Just in case)
+              <div className="flex flex-col items-center justify-center h-full border-2 border-dashed border-gray-200 rounded-2xl text-gray-400 bg-gray-50/50">
+                 <AlertTriangle size={48} className="mb-2 opacity-50"/>
+                 <p>Select a second project to compare</p>
+              </div>
+            )}
+
           </div>
+
+          {/* Smart Recommendation Banner */}
+          {p2 && (
+             <div className="mt-8 p-4 rounded-xl bg-blue-50 border border-blue-100 flex items-start gap-3">
+                <Zap className="text-blue-600 shrink-0 mt-1" size={20} />
+                <div>
+                  <h5 className="font-bold text-blue-900 text-sm mb-1">Impact Analysis</h5>
+                  <p className="text-blue-800 text-xs leading-relaxed">
+                    {p1.price_per_ton < p2.price_per_ton 
+                      ? `${p1.title} offers a better price point ($${p1.price_per_ton}/ton), allowing you to offset ${(p2.price_per_ton / p1.price_per_ton * 10).toFixed(1)} tons for the price of 10 tons of the other project.`
+                      : `${p2.title} offers a better price point ($${p2.price_per_ton}/ton), allowing you to offset ${(p1.price_per_ton / p2.price_per_ton * 10).toFixed(1)} tons for the price of 10 tons of the other project.`
+                    }
+                  </p>
+                </div>
+             </div>
+          )}
+
         </div>
       </div>
     </div>
   );
 };
-
-const ProjectColumn = ({ project, otherProject, onBuy }) => {
-  // Logic to highlight the better option
-  const isCheaper = project.price_per_ton < otherProject.price_per_ton;
-  const moreImpact = project.sdg_impact.length > otherProject.sdg_impact.length;
-  const report = project.auditor_reports?.[0]; // Get the first review
-
-  return (
-    <div className="p-6 flex flex-col h-full bg-gray-50/30">
-      {/* Image Fix: Added bg-gray-200 fallback */}
-      <div className="h-48 rounded-xl overflow-hidden mb-5 bg-gray-200 shrink-0">
-        <img src={project.image_url} className="w-full h-full object-cover" alt={project.title} />
-      </div>
-
-      <div className="flex-grow">
-        <h3 className="font-bold text-2xl mb-1 text-gray-900">{project.title}</h3>
-        <p className="text-sm text-gray-500 mb-6 font-medium bg-gray-100 inline-block px-2 py-1 rounded">{project.type}</p>
-        
-        <div className="space-y-3 mb-8">
-           <StatRow label="Price / Ton" value={`$${project.price_per_ton}`} highlight={isCheaper} />
-           <StatRow label="Vintage" value={project.vintage_year} />
-           <StatRow label="Standard" value={project.verification_standard} icon={ShieldCheck} />
-           <StatRow label="SDG Goals" value={`${project.sdg_impact.length} Goals Achieved`} highlight={moreImpact} />
-        </div>
-
-        {/* THE "REVIEW" SECTION (Auditor Report) */}
-        {report && (
-          <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg mb-6">
-            <div className="flex items-center mb-2">
-              <FileText size={16} className="text-blue-600 mr-2" />
-              <span className="text-xs font-bold text-blue-800 uppercase tracking-wide">Auditor Review</span>
-            </div>
-            <p className="text-sm text-gray-700 italic">"{report.summary}"</p>
-            <div className="mt-2 flex justify-between items-center text-xs text-gray-500 border-t border-blue-100 pt-2">
-              <span>Verified by: <strong>{report.auditor_name}</strong></span>
-              <span>Score: <span className="text-blue-700 font-bold">{report.rating}/10</span></span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <button onClick={() => onBuy(project)} className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold hover:bg-green-600 transition shadow-lg shrink-0">
-        Select This Project
-      </button>
-    </div>
-  );
-};
-
-const StatRow = ({ label, value, highlight, icon: Icon }) => (
-  <div className={`flex justify-between items-center p-3 rounded-lg ${highlight ? 'bg-green-100 ring-1 ring-green-500' : 'bg-white border border-gray-100'}`}>
-    <span className="text-sm text-gray-500 flex items-center">
-      {Icon && <Icon size={14} className="mr-1 text-gray-400" />} {label}
-    </span>
-    <span className={`font-bold ${highlight ? 'text-green-800' : 'text-gray-900'}`}>{value}</span>
-  </div>
-);
 
 export default ComparisonModal;
