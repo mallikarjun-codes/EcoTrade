@@ -10,7 +10,7 @@ import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import Footer from './components/Footer'; 
 import MarketingSections from './components/MarketingSections'; 
 import Registry from './components/Registry'; 
-import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe, Sparkles } from 'lucide-react';
+import { Loader2, ArrowRightLeft, LayoutDashboard, Store, Leaf, Globe } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, UserButton, useUser } from "@clerk/clerk-react";
 
 // --- LANDING PAGE (Logged Out) ---
@@ -50,7 +50,7 @@ const Marketplace = () => {
   const [showPayment, setShowPayment] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   
-  // --- FIX: Store Selected Quantity ---
+  // Quantity State
   const [selectedQuantity, setSelectedQuantity] = useState(1);
 
   useEffect(() => {
@@ -59,17 +59,17 @@ const Marketplace = () => {
       .catch(err => { console.error("API Error:", err); setLoading(false); });
   }, []);
 
-  // --- UPDATED HANDLER: Now accepts quantity ---
+  // Handler: Buy Click
   const handleBuyClick = (project, quantity = 1) => {
     setShowCompareModal(false);
     setSelectedProject(project);
-    setSelectedQuantity(quantity); // Store the user's input
+    setSelectedQuantity(quantity); 
     setShowPayment(true);
   };
 
+  // Handler: Payment Success
   const handlePaymentSuccess = async (purchasedQuantity) => {
     try {
-      // Use the quantity passed from the Modal
       const finalQuantity = purchasedQuantity || 1;
       const finalPrice = selectedProject.price_per_ton * finalQuantity;
 
@@ -85,9 +85,7 @@ const Marketplace = () => {
       const response = await createOrder(orderData);
       setShowPayment(false); 
       
-      // Success Alert
       alert(`Success! 🚀\n\nYou have successfully offset ${finalQuantity} tons.\nTotal Paid: $${finalPrice}`);
-      
       navigate(`/order/${response.data._id}`); 
     } catch (error) {
       console.error(error);
@@ -95,6 +93,7 @@ const Marketplace = () => {
       setShowPayment(false);
     }
   };
+
   const toggleCompareMode = () => { setCompareMode(!compareMode); setSelectedForCompare([]); };
   
   const handleToggleCompare = (project) => {
@@ -112,7 +111,7 @@ const Marketplace = () => {
         <PaymentModal 
             project={selectedProject} 
             user={user} 
-            quantity={selectedQuantity} // Pass quantity to modal if supported
+            quantity={selectedQuantity} 
             onClose={() => setShowPayment(false)} 
             onSuccess={handlePaymentSuccess}
         />
@@ -154,7 +153,7 @@ const Marketplace = () => {
             <ProjectCard 
               key={project._id} 
               project={project} 
-              onBuy={handleBuyClick} // Passes (project, quantity) to handler
+              onBuy={handleBuyClick} 
               isCompareMode={compareMode}
               isSelected={!!selectedForCompare.find(p => p._id === project._id)}
               onToggleCompare={handleToggleCompare}
@@ -163,7 +162,7 @@ const Marketplace = () => {
         </div>
       )}
 
-      {/* --- MARKETING SECTIONS (SCROLL TARGETS) --- */}
+      {/* --- MARKETING SECTIONS --- */}
       <MarketingSections />
 
     </div>
@@ -172,7 +171,8 @@ const Marketplace = () => {
 
 // --- MAIN LAYOUT ---
 function App() {
-  const { isLoaded, user } = useUser();
+  // *** THIS WAS THE FIX: Added 'isSignedIn' here ***
+  const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
 
   if (!isLoaded) return <div className="min-h-screen flex justify-center items-center"><Loader2 className="animate-spin text-green-600" size={48} /></div>;
@@ -193,7 +193,7 @@ function App() {
                  <h1 className="text-xl font-bold tracking-tight text-gray-900">EcoTrade</h1>
               </div>
 
-              {/* Center Links (Pill Style) */}
+              {/* Center Links */}
               <div className="hidden md:flex items-center gap-2">
                 <a href="#how-it-works" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">How it Works</a>
                 <a href="#impact" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">Impact</a>
@@ -217,8 +217,8 @@ function App() {
                   <span className="hidden sm:inline ml-2">Market</span>
                 </Link>
 
-                {/* Admin Link (Secured) */}
-                {user?.primaryEmailAddress?.emailAddress === import.meta.env.VITE_ADMIN_EMAIL && (
+                {/* DEMO MODE: ALWAYS SHOW ADMIN LINK */}
+                {isSignedIn && (
                   <Link to="/admin" className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">
                     <LayoutDashboard size={20} />
                     <span className="hidden sm:inline ml-2">Admin</span> 

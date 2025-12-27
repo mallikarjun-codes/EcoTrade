@@ -1,30 +1,39 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import { useUser } from "@clerk/clerk-react";
+import { Navigate } from 'react-router-dom';
 
 const ProtectedAdminRoute = ({ children }) => {
   const { isLoaded, isSignedIn, user } = useUser();
-  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
 
   if (!isLoaded) {
-    return <div>Loading permissions...</div>;
+    return <div className="p-10 text-center">Loading permissions...</div>;
   }
 
-  // 1. Check if signed in
   if (!isSignedIn) {
     return <Navigate to="/" replace />;
   }
 
-  // 2. Check if email matches Admin
-  const userEmail = user.primaryEmailAddress?.emailAddress;
+  // --- HACKATHON DEMO MODE ---
+  // STRICT SECURITY (Production):
+  // const isAdmin = user.primaryEmailAddress.emailAddress === import.meta.env.VITE_ADMIN_EMAIL;
   
-  if (userEmail !== adminEmail) {
-    console.warn("Unauthorized Access Attempt blocked.");
+  // DEMO SECURITY (Hackathon):
+  // We allow ANY logged-in user to be an Admin so Judges can test the dashboard.
+  const isAdmin = true; 
+
+  if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 
-  // 3. If passed, render the Dashboard
-  return children;
+  return (
+    <>
+      {/* Visual Indicator for Judges */}
+      <div className="bg-yellow-400 text-black text-xs font-bold text-center py-1 px-2 fixed bottom-0 right-0 z-[9999] opacity-80 pointer-events-none rounded-tl-lg">
+        🚧 DEMO ADMIN ACCESS ENABLED
+      </div>
+      {children}
+    </>
+  );
 };
 
 export default ProtectedAdminRoute;
