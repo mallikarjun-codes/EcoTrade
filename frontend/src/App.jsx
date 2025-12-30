@@ -171,7 +171,6 @@ const Marketplace = () => {
 
 // --- MAIN LAYOUT ---
 function App() {
-  // *** THIS WAS THE FIX: Added 'isSignedIn' here ***
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
 
@@ -187,13 +186,13 @@ function App() {
           <header className="navbar-bg sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
               
-              {/* Logo Side */}
+              {/* Logo Side - UNTOUCHED */}
               <div className="flex items-center cursor-pointer gap-2 hover:opacity-80 transition" onClick={() => navigate('/')}>
                  <Leaf className="text-green-600 w-6 h-6" />
                  <h1 className="text-xl font-bold tracking-tight text-gray-900">EcoTrade</h1>
               </div>
 
-              {/* Center Links */}
+              {/* Center Links - UNTOUCHED */}
               <div className="hidden md:flex items-center gap-2">
                 <a href="#how-it-works" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">How it Works</a>
                 <a href="#impact" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/50 rounded-full transition-all">Impact</a>
@@ -203,10 +202,10 @@ function App() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-2">
                 
-                {/* REGISTRY LINK */}
-                <Link to="/registry" className="hidden sm:flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all group">
+                {/* REGISTRY LINK - FIXED TO SHOW ON MOBILE */}
+                <Link to="/registry" className="flex items-center px-4 py-2 text-sm font-medium text-gray-600 hover:text-green-700 hover:bg-green-50 rounded-full transition-all group">
                   <Globe size={18} className="mr-2 text-gray-400 group-hover:text-green-600 transition-colors" />
-                  <span className="relative top-[1px]">Registry</span>
+                  <span className="relative top-[1px] hidden sm:inline">Registry</span>
                   <span className="ml-2 flex items-center justify-center bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-green-200 shadow-sm">
                     NEW
                   </span>
